@@ -54,11 +54,6 @@ def plot_trajectory_and_ellipse(x, y, a, b, c, areas):
     plt.plot([center_x, center_x], [center_y, center_y + b], 'g-', label='Semieje menor (b)')
     plt.scatter([center_x + c, center_x - c], [center_y, center_y], color='red', label='Focos')
 
-    for i, area in enumerate(areas):
-        plt.annotate(f'Área {i + 1}', xy=(x[i * len(x) // len(areas)], y[i * len(y) // len(areas)]),
-                     xytext=(x[i * len(x) // len(areas)] + 0.01, y[i * len(y) // len(areas)] - 0.01),
-                     fontsize=10, color='blue')
-
     plt.xlabel('Posición en x')
     plt.ylabel('Posición en y')
     plt.title('Elipse de la trayectoria')
@@ -79,3 +74,5 @@ for i, area in enumerate(areas):
     print(f'Área {i + 1}: {area:.4f} m^2')
 
 plot_trajectory_and_ellipse(x, y, a, b, c, areas)
+
+print(x, y)
