@@ -20,6 +20,7 @@ t = [0.067, 0.1, 0.133, 0.167, 0.2, 0.234, 0.267, 0.3, 0.334, 0.367, 0.4, 0.434,
 
 import matplotlib.pyplot as plt
 import math
+import numpy as np
 
 def extract_coordinates(data):
     x = [point[0] for point in data]
@@ -46,7 +47,7 @@ def calculate_areas(x, y, t, intervals):
         areas.append(area)
     return areas
 
-def plot_trajectory_and_ellipse(x, y, a, b, c, areas):
+def plot_trajectory_and_ellipse(x, y, a, b, c):
     plt.scatter(x, y, label='Trayectoria del péndulo')
 
     center_x, center_y = (max(x) + min(x)) / 2, (max(y) + min(y)) / 2
@@ -54,9 +55,15 @@ def plot_trajectory_and_ellipse(x, y, a, b, c, areas):
     plt.plot([center_x, center_x], [center_y, center_y + b], 'g-', label='Semieje menor (b)')
     plt.scatter([center_x + c, center_x - c], [center_y, center_y], color='red', label='Focos')
 
+    # Dibujar elipse
+    angle = np.linspace(0, 2 * np.pi, 100)
+    elipse_x = center_x + a * np.cos(angle)
+    elipse_y = center_y + b * np.sin(angle)
+    plt.plot(elipse_x, elipse_y, 'b-', label='Elipse ajustada')
+
     plt.xlabel('Posición en x')
     plt.ylabel('Posición en y')
-    plt.title('Elipse de la trayectoria')
+    plt.title('Comparación de la elipse ajustada y la trayectoria real')
     plt.legend(loc='upper right')
     plt.show()
 
@@ -64,15 +71,11 @@ def plot_trajectory_and_ellipse(x, y, a, b, c, areas):
 x, y = extract_coordinates(data)
 a, b = calculate_semi_axes(x, y)
 c = calculate_focal_distance(a, b)
-areas = calculate_areas(x, y, t, 3)
+
 
 print(f'Semieje mayor (a): {a:.4f} m')
 print(f'Semieje menor (b): {b:.4f} m')
+print(f'punto focal (c): {c:.4f} m')
 print(f'Excentricidad (c/a): {c / a:.4f}')
-print(f'Áreas medidas en intervalos de tiempo iguales:')
-for i, area in enumerate(areas):
-    print(f'Área {i + 1}: {area:.4f} m^2')
 
-plot_trajectory_and_ellipse(x, y, a, b, c, areas)
-
-print(x, y)
+plot_trajectory_and_ellipse(x, y, a, b, c)
