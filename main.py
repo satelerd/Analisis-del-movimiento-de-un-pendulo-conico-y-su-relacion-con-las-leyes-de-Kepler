@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 
+
 def extract_coordinates(data):
     x = [point[0] for point in data]
     y = [point[1] for point in data]
