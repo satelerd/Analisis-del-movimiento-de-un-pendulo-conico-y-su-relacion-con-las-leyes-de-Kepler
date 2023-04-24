@@ -14,75 +14,68 @@ data = [(-0.138, 0.0), (-0.128, -0.03799), (-0.116, -0.05057),
         (-0.138, -0.02733), (-0.13, -0.0411), (-0.118, -0.05316),
         (-0.104, -0.06434), (-0.0881, -0.07354), (-0.07058, -0.07957),
         (-0.05221, -0.08385), (-0.03357, -0.08673)]
+t = [0.067, 0.1, 0.133, 0.167, 0.2, 0.234, 0.267, 0.3, 0.334, 0.367, 0.4, 0.434, 0.467, 0.5, 0.534, 0.567, 0.601, 0.634, 0.667, 0.701, 0.734, 0.767, 0.801, 0.834, 0.868, 0.901, 0.934, 0.968, 1.001, 1.034, 1.068, 1.101, 1.134, 1.168, 1.201, 1.235, 1.268, 1.301, 1.335, 1.368, 1.401, 1.435, 1.468, 1.501, 1.535, 1.568, 1.602]
+
+
 
 import matplotlib.pyplot as plt
 import math
 
-
 def extract_coordinates(data):
-  x = [point[0] for point in data]
-  y = [point[1] for point in data]
-  return x, y
-
+    x = [point[0] for point in data]
+    y = [point[1] for point in data]
+    return x, y
 
 def calculate_semi_axes(x, y):
-  min_x, max_x = min(x), max(x)
-  min_y, max_y = min(y), max(y)
-  a = (max_x - min_x) / 2
-  b = (max_y - min_y) / 2
-  return a, b
-
+    min_x, max_x = min(x), max(x)
+    min_y, max_y = min(y), max(y)
+    a = (max_x - min_x) / 2
+    b = (max_y - min_y) / 2
+    return a, b
 
 def calculate_focal_distance(a, b):
-  return math.sqrt(a**2 - b**2)
+    return math.sqrt(a**2 - b**2)
 
+def calculate_areas(x, y, t, intervals):
+    areas = []
+    step = len(x) // intervals
+    for i in range(0, len(x) - step, step):
+        x1, y1, t1 = x[i], y[i], t[i]
+        x2, y2, t2 = x[i + step], y[i + step], t[i + step]
+        area = 0.5 * abs(x1 * y2 - x2 * y1) * (t2 - t1)
+        areas.append(area)
+    return areas
 
-def calculate_areas(x, y):
-  areas = []
-  for i in range(len(x) - 1):
-    x1, y1 = x[i], y[i]
-    x2, y2 = x[i + 1], y[i + 1]
-    area = 0.5 * abs(x1 * y2 - x2 * y1)
-    areas.append(area)
-  return areas
+def plot_trajectory_and_ellipse(x, y, a, b, c, areas):
+    plt.scatter(x, y, label='Trayectoria del péndulo')
 
+    center_x, center_y = (max(x) + min(x)) / 2, (max(y) + min(y)) / 2
+    plt.plot([center_x, center_x + a], [center_y, center_y], 'r-', label='Semieje mayor (a)')
+    plt.plot([center_x, center_x], [center_y, center_y + b], 'g-', label='Semieje menor (b)')
+    plt.scatter([center_x + c, center_x - c], [center_y, center_y], color='red', label='Focos')
 
-def verify_kepler_second_law(areas):
-  avg_area = sum(areas) / len(areas)
-  area_tolerance = 0.1 * avg_area
-  return all(abs(area - avg_area) <= area_tolerance for area in areas)
+    for i, area in enumerate(areas):
+        plt.annotate(f'Área {i + 1}', xy=(x[i * len(x) // len(areas)], y[i * len(y) // len(areas)]),
+                     xytext=(x[i * len(x) // len(areas)] + 0.01, y[i * len(y) // len(areas)] - 0.01),
+                     fontsize=10, color='blue')
 
-
-def plot_trajectory_and_ellipse(x, y, a, b, c):
-  plt.scatter(x, y, label='Trayectoria del péndulo')
-
-  center_x, center_y = (max(x) + min(x)) / 2, (max(y) + min(y)) / 2
-  plt.plot([center_x - a, center_x + a], [center_y, center_y],
-           'r-',
-           label='Eje mayor (2a)')
-  plt.plot([center_x, center_x], [center_y - b, center_y + b],
-           'g-',
-           label='Eje menor (2b)')
-  plt.scatter([center_x - c, center_x + c], [center_y, center_y],
-              color='red',
-              label='Focos')
-
-  plt.xlabel('Posición en x')
-  plt.ylabel('Posición en y')
-  plt.title('Elipse de la trayectoria')
-  plt.legend()
-  plt.show()
+    plt.xlabel('Posición en x')
+    plt.ylabel('Posición en y')
+    plt.title('Elipse de la trayectoria')
+    plt.legend(loc='upper right')
+    plt.show()
 
 
 x, y = extract_coordinates(data)
 a, b = calculate_semi_axes(x, y)
 c = calculate_focal_distance(a, b)
-areas = calculate_areas(x, y)
-kepler_second_law_holds = verify_kepler_second_law(areas)
+areas = calculate_areas(x, y, t, 3)
 
-print(f'Semieje mayor (a): {a:.4f}')
-print(f'Semieje menor (b): {b:.4f}')
-print(f'Distancia focal (c): {c:.4f}')
-print(f'La segunda ley de Kepler se cumple: {kepler_second_law_holds}')
+print(f'Semieje mayor (a): {a:.4f} m')
+print(f'Semieje menor (b): {b:.4f} m')
+print(f'Excentricidad (c/a): {c / a:.4f}')
+print(f'Áreas medidas en intervalos de tiempo iguales:')
+for i, area in enumerate(areas):
+    print(f'Área {i + 1}: {area:.4f} m^2')
 
-plot_trajectory_and_ellipse(x, y, a, b, c)
+plot_trajectory_and_ellipse(x, y, a, b, c, areas)
