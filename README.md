@@ -1,0 +1,1 @@
+# Analisis-del-movimiento-de-un-pendulo-conico-y-su-relacion-con-las-leyes-de-Kepler
